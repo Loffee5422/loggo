@@ -15,7 +15,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+  mainWindow.loadFile(path.join(__dirname, '../../dist/index.html'));
   
   // Open DevTools in development
   if (process.env.NODE_ENV === 'development') {
