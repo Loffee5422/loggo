@@ -39,16 +39,16 @@ interface VisualizationPanelProps {
 }
 
 const VisualizationPanel: React.FC<VisualizationPanelProps> = ({ activities, onAddActivity }) => {
-  const [activityType, setActivityType] = useState<'win' | 'loss'>('win');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (amount && parseFloat(amount) > 0) {
+    const numAmount = parseFloat(amount);
+    if (amount && numAmount !== 0) {
       onAddActivity({
-        type: activityType,
-        amount: parseFloat(amount),
+        type: numAmount > 0 ? 'win' : 'loss',
+        amount: Math.abs(numAmount),
         description: description.trim()
       });
       setAmount('');
@@ -144,70 +144,46 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({ activities, onA
 
   return (
     <div className="visualization-panel">
-      <div className="visualization-header">
-        <h2>Activity Data & Visualizations</h2>
-      </div>
-
-      <div className="activity-form">
-        <h3>Log New Activity</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="form-row">
-            <div className="form-group">
-              <label className="form-label">Type:</label>
-              <select
-                className="form-input"
-                value={activityType}
-                onChange={(e) => setActivityType(e.target.value as 'win' | 'loss')}
-              >
-                <option value="win">Win</option>
-                <option value="loss">Loss</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Amount:</label>
-              <input
-                type="number"
-                className="form-input"
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="form-group">
-            <label className="form-label">Description (optional):</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Brief description..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="btn" disabled={!amount || parseFloat(amount) <= 0}>
-            Log Activity
+      <div className="activity-form-compact">
+        <form onSubmit={handleSubmit} className="quick-log-form">
+          <input
+            type="number"
+            className="quick-log-input"
+            placeholder="Enter amount (+ for gain, - for loss)"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            autoFocus
+          />
+          <input
+            type="text"
+            className="quick-log-description"
+            placeholder="Description (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <button type="submit" className="btn btn-quick-log" disabled={!amount || parseFloat(amount) === 0}>
+            Log
           </button>
         </form>
       </div>
 
-      <div className="stats-container">
+      <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-label">Total Activities</div>
           <div className="stat-value">{stats.totalActivities}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Total Wins</div>
+          <div className="stat-label">Total Gains</div>
           <div className="stat-value positive">${stats.totalWins.toFixed(2)}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Total Losses</div>
           <div className="stat-value negative">${stats.totalLosses.toFixed(2)}</div>
         </div>
-        <div className="stat-card">
+        <div className="stat-card stat-card-highlight">
           <div className="stat-label">Net Profit/Loss</div>
-          <div className={`stat-value ${stats.netProfit >= 0 ? 'positive' : 'negative'}`}>
+          <div className={`stat-value stat-value-large ${stats.netProfit >= 0 ? 'positive' : 'negative'}`}>
             ${stats.netProfit.toFixed(2)}
           </div>
         </div>
@@ -218,28 +194,26 @@ const VisualizationPanel: React.FC<VisualizationPanelProps> = ({ activities, onA
       </div>
 
       {activities.length > 0 ? (
-        <>
-          <div className="chart-container">
+        <div className="charts-grid">
+          <div className="chart-container chart-main">
             <h3 className="chart-title">Cumulative Profit/Loss Over Time</h3>
-            <Line data={chartData} options={{ responsive: true, maintainAspectRatio: true }} />
+            <Line data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div className="chart-container">
-              <h3 className="chart-title">Win/Loss Count</h3>
-              <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: true }} />
-            </div>
-
-            <div className="chart-container">
-              <h3 className="chart-title">Win/Loss Distribution by Amount</h3>
-              <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: true }} />
-            </div>
+          <div className="chart-container chart-small">
+            <h3 className="chart-title">Win/Loss Count</h3>
+            <Bar data={barChartData} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>
-        </>
+
+          <div className="chart-container chart-small">
+            <h3 className="chart-title">Distribution by Amount</h3>
+            <Pie data={pieChartData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+        </div>
       ) : (
         <div className="empty-state">
           <h3>No activity data yet</h3>
-          <p>Log your first activity above to see visualizations</p>
+          <p>Enter a positive number for gains or a negative number for losses</p>
         </div>
       )}
     </div>
