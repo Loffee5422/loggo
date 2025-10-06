@@ -1,0 +1,54 @@
+{
+  "name": "loggo",
+  "version": "1.0.0",
+  "description": "Visualise important information for activity, planning and more",
+  "main": "src/main/main.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "start": "electron . --no-sandbox",
+    "package": "npm run build && electron-builder --win",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.loggo.app",
+    "productName": "Loggo",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "src/main/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.ico"
+    }
+  },
+  "keywords": ["log", "reminder", "tracker", "visualization"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chart.js": "^4.5.0",
+    "electron": "^38.2.1",
+    "react": "^19.2.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "css-loader": "^7.1.2",
+    "electron-builder": "^26.0.12",
+    "html-webpack-plugin": "^5.6.4",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.102.0",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}
